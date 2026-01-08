@@ -30,22 +30,47 @@ mobileNavLinks.forEach(link => {
     });
 });
 
-// Smooth Scrolling for Anchor Links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const targetId = this.getAttribute('href');
-        if (targetId === '#') return;
+// Fix TOC Structure Function
+function fixTOCStructure() {
+    const tocElements = document.querySelectorAll('.toc');
+    
+    tocElements.forEach(toc => {
+        const olElements = toc.querySelectorAll('ol');
         
-        const targetElement = document.querySelector(targetId);
-        if (targetElement) {
-            window.scrollTo({
-                top: targetElement.offsetTop - 80, // Account for header height
-                behavior: 'smooth'
-            });
-        }
+        olElements.forEach(ol => {
+            const parent = ol.parentNode;
+            if (parent && parent.tagName === 'OL') {
+                const previousLi = ol.previousElementSibling;
+                if (previousLi && previousLi.tagName === 'LI') {
+                    previousLi.appendChild(ol);
+                }
+            }
+        });
     });
-});
+}
+
+// Smooth Scrolling for Anchor Links with Number ID Support
+function initSmoothScrolling() {
+    const anchorLinks = document.querySelectorAll('a[href^="#"]');
+    
+    anchorLinks.forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('href');
+            if (targetId === '#') return;
+            
+            const id = targetId.substring(1);
+            const targetElement = document.getElementById(id);
+            
+            if (targetElement) {
+                window.scrollTo({
+                    top: targetElement.offsetTop - 80, // Account for header height
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+}
 
 // Back to Top Button
 const backToTopBtn = document.createElement('button');
@@ -229,6 +254,12 @@ window.addEventListener('DOMContentLoaded', () => {
     // Set initial theme variables
     const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
     updateThemeVariables(currentTheme);
+    
+    // Fix TOC structure
+    fixTOCStructure();
+    
+    // Initialize smooth scrolling
+    initSmoothScrolling();
     
     // Highlight active link on page load
     highlightActiveLink();

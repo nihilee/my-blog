@@ -33,7 +33,7 @@
   [handler]
   (fn [request]
     (let [{:keys [clean-urls blog-prefix public-dest]} @resolved-config
-          req-uri (.substring (url-decode (:uri request)) 1)
+          req-uri (.substring (:uri request) 1)
           res-path (if (or (.endsWith req-uri "/")
                            (.endsWith req-uri ".html")
                            (-> (string/split req-uri #"/")
@@ -51,30 +51,34 @@
                                             (path req-uri "index.html")
                                             (path (str req-uri ".html")))
                        :dirty (path (str req-uri ".html")))
-                     req-uri)]
-        (or (let [rsp (file-response res-path {:root public-dest})
-                  body (:body rsp)]
-              ;; Add content-type; it cannot be derived from the extension if `:[no-]trailing-slash`
-              (cond-> rsp
-                      (and body
-                           (instance? File body)
-                           (string/ends-with? (.getName body) ".html"))
-                      (assoc-in [:headers "Content-Type"] "text/html; charset=utf-8")
-                      (and body
-                           (instance? File body)
-                           (string/ends-with? (.getName body) ".xml"))
-                      (assoc-in [:headers "Content-Type"] "application/rss+xml; charset=utf-8")))
-            (handler request)))))
+                     req-uri)
+          full-path (path public-dest res-path)
+          file (File. full-path)]
+      (println "DEBUG: req-uri:" req-uri)
+      (println "DEBUG: res-path:" res-path)
+      (println "DEBUG: full-path:" full-path)
+      (println "DEBUG: file exists:" (.exists file))
+      (or (let [rsp (file-response res-path {:root public-dest})
+                body (:body rsp)]
+            (cond-> rsp
+                    (and body
+                         (instance? File body)
+                         (string/ends-with? (.getName body) ".html"))
+                    (assoc-in [:headers "Content-Type"] "text/html; charset=utf-8")
+                    (and body
+                         (instance? File body)
+                         (string/ends-with? (.getName body) ".xml"))
+                    (assoc-in [:headers "Content-Type"] "application/rss+xml; charset=utf-8")))
+          (handler request))))) 
 
 (defroutes routes
   (GET "/" [] (redirect (let [config (resolve-config)]
                           (path (:blog-prefix config)
                                 (when (= (:clean-urls config) :dirty)
                                   "index.html")))))
-  (route/files "/")
   (route/not-found "Page not found"))
 
-(def handler (wrap-subdirectories routes))
+(def handler (wrap-subdirectories (route/files "/")))
 
 (defn serve
   "Entrypoint for running via tools-deps (clojure)"
