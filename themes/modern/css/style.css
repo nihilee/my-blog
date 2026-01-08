@@ -73,6 +73,36 @@ body {
     padding: 0 var(--space-4);
 }
 
+/* Tables */
+.post-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--space-8);
+    overflow-x: auto;
+    display: block;
+}
+
+.post-body table th,
+.post-body table td {
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.post-body table th {
+    background-color: var(--bg-secondary);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.post-body table tr:nth-child(even) {
+    background-color: var(--bg-secondary);
+}
+
+.post-body table tr:hover {
+    background-color: var(--bg-tertiary);
+}
+
 /* Grid Layout */
 .grid {
     display: grid;
@@ -305,6 +335,29 @@ body {
     height: auto;
     border-radius: var(--radius-md);
     margin-bottom: var(--space-4);
+}
+
+.post-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: var(--space-4);
+}
+
+.post-body table th,
+.post-body table td {
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--border-color);
+    text-align: left;
+}
+
+.post-body table th {
+    background-color: var(--bg-secondary);
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.post-body table tr:nth-child(even) {
+    background-color: var(--bg-secondary);
 }
 
 /* Post Tags */
