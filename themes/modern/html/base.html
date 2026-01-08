@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    {% if mastodon.host %}
+    <a rel="me" href="https://{{mastodon.host}}/@{{mastodon.acct}}"></a>
+    {% endif %}
+    <title>{{title}}{% block subtitle %}{% endblock %}</title>
+    {% block meta %}
+    <meta name="description" content="{{description}}">
+    <meta name="keywords" content="">
+    {% endblock %}
+    <link rel="canonical" href="{{site-url}}{{uri}}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css">
+    {% style "css/style.css" %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <a href="{{index-uri}}" class="logo">{{title}}</a>
+                
+                <!-- Desktop Navigation -->
+                <nav class="nav desktop-nav">
+                    <ul class="nav-list">
+                        <li class="nav-item{% if home %} active{% endif %}"><a href="{{index-uri}}" class="nav-link">Home</a></li>
+                        <li class="nav-item{% if archives %} active{% endif %}"><a href="{{archives-uri}}" class="nav-link">Archives</a></li>
+                        {% for nav-page in navbar-pages %}
+                        <li class="nav-item{% ifequal page.uri nav-page.uri %} active{% endifequal %}">
+                            <a href="{{nav-page.uri}}" class="nav-link">{{nav-page.title}}</a>
+                        </li>
+                        {% endfor %}
+                        <li class="nav-item"><a href="{{rss-uri}}" class="nav-link" target="_blank"><i class="fas fa-rss"></i></a></li>
+                    </ul>
+                </nav>
+                
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+        
+        <!-- Mobile Navigation -->
+        <nav class="nav mobile-nav" id="mobileNav">
+            <div class="container">
+                <ul class="nav-list">
+                    <li class="nav-item{% if home %} active{% endif %}"><a href="{{index-uri}}" class="nav-link">Home</a></li>
+                    <li class="nav-item{% if archives %} active{% endif %}"><a href="{{archives-uri}}" class="nav-link">Archives</a></li>
+                    {% for nav-page in navbar-pages %}
+                    <li class="nav-item{% ifequal page.uri nav-page.uri %} active{% endifequal %}">
+                        <a href="{{nav-page.uri}}" class="nav-link">{{nav-page.title}}</a>
+                    </li>
+                    {% endfor %}
+                    <li class="nav-item"><a href="{{rss-uri}}" class="nav-link" target="_blank">RSS Feed</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main">
+        <div class="container">
+            <div class="grid">
+                <!-- Primary Content -->
+                <div class="primary">
+                    <div class="content">
+                        {% block content %}
+                        {% endblock %}
+                    </div>
+                </div>
+                
+                <!-- Sidebar -->
+                <aside class="sidebar">
+                    <!-- About Section -->
+                    <section class="widget about-widget">
+                        <h3 class="widget-title">About</h3>
+                        <p class="widget-text">{{description}}</p>
+                    </section>
+                    
+                    <!-- Recent Posts -->
+                    {% if latest-posts|not-empty %}
+                    <section class="widget recent-posts-widget">
+                        <h3 class="widget-title">Recent Posts</h3>
+                        <ul class="widget-list">
+                            {% for post in latest-posts %}
+                            <li class="widget-list-item">
+                                <a href="{{post.uri}}" class="widget-list-link">{{post.title}}</a>
+                                <span class="widget-list-date">{{post.date|date:shortDate}}</span>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                    {% endif %}
+                    
+                    <!-- Tags -->
+                    {% if tags|not-empty %}
+                    <section class="widget tags-widget">
+                        <h3 class="widget-title">Tags</h3>
+                        <div class="tags-cloud">
+                            {% for tag in tags %}
+                            <a href="{{tag.uri}}" class="tag">{{tag.name}}</a>
+                            {% endfor %}
+                        </div>
+                    </section>
+                    {% endif %}
+                    
+                    <!-- Links -->
+                    <section class="widget links-widget">
+                        <h3 class="widget-title">Links</h3>
+                        <ul class="widget-list">
+                            <li class="widget-list-item"><a href="http://cryogenweb.org/docs/home.html" class="widget-list-link">Cryogen Docs</a></li>
+                            {% for page in sidebar-pages %}
+                            <li class="widget-list-item"><a href="{{page.uri}}" class="widget-list-link">{{page.title}}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </section>
+                </aside>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-info">
+                    <p class="copyright">&copy; {{today|date:yyyy}} {{author}}. All rights reserved.</p>
+                </div>
+                <div class="footer-links">
+                    {% if twitter-acct %}<a href="https://twitter.com/{{twitter-acct}}" class="social-link" target="_blank"><i class="fab fa-twitter"></i></a>{% endif %}
+                    {% if mastodon.host %}<a href="https://{{mastodon.host}}/@{{mastodon.acct}}" class="social-link" target="_blank"><i class="fab fa-mastodon"></i></a>{% endif %}
+                    <a href="{{rss-uri}}" class="social-link" target="_blank"><i class="fas fa-rss"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+    <script>hljs.highlightAll();</script>
+    {% script "js/script.js" %}
+    {% if post.klipse %} {{post.klipse|safe}} {% endif %}
+    {% if page.klipse %} {{page.klipse|safe}} {% endif %}
+</body>
+</html>

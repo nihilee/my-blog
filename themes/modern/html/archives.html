@@ -1,0 +1,20 @@
+{% extends "/html/base.html" %}
+{% block content %}
+<div class="archives">
+    <h1 class="page-title">Archives</h1>
+    
+    {% for group in groups %}
+    <section class="archive-group">
+        <h2 class="archive-year">{{group.group}}</h2>
+        <ul class="archive-posts">
+            {% for post in group.posts %}
+            <li class="archive-post">
+                <a href="{{post.uri}}" class="archive-post-link">{{post.title}}</a>
+                <span class="archive-post-date">{{post.date|date:shortDate}}</span>
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endfor %}
+</div>
+{% endblock %}

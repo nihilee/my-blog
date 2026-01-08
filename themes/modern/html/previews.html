@@ -1,0 +1,46 @@
+{% extends "/html/base.html" %}
+{% block content %}
+<div class="post-list">
+    {% for post in posts %}
+    <article class="post-preview">
+        <header class="post-preview-header">
+            <div class="post-preview-meta">
+                <span class="post-preview-date">{{post.date|date:longDate}}</span>
+                {% if post.author %}
+                <span class="post-preview-author">By: {{post.author}}</span>
+                {% endif %}
+            </div>
+            <h2 class="post-preview-title"><a href="{{post.uri}}" class="post-preview-link">{{post.title}}</a></h2>
+        </header>
+        <div class="post-preview-excerpt">
+            {% if post.preview %}
+            {{post.preview|safe}}
+            {% else %}
+            {{post.content|safe}}
+            {% endif %}
+        </div>
+        {% if post.tags|not-empty %}
+        <footer class="post-preview-tags">
+            <ul class="tags-list">
+                {% for tag in post.tags %}
+                <li class="tag-item"><a href="{{tag.uri}}" class="tag-link">{{tag.name}}</a></li>
+                {% endfor %}
+            </ul>
+        </footer>
+        {% endif %}
+        <a href="{{post.uri}}" class="read-more">Read More <i class="fas fa-arrow-right"></i></a>
+    </article>
+    {% endfor %}
+</div>
+
+{% if older-posts-uri or newer-posts-uri %}
+<nav class="pagination">
+    {% if older-posts-uri %}
+    <a href="{{older-posts-uri}}" class="pagination-prev">&laquo; Older Posts</a>
+    {% endif %}
+    {% if newer-posts-uri %}
+    <a href="{{newer-posts-uri}}" class="pagination-next">Newer Posts &raquo;</a>
+    {% endif %}
+</nav>
+{% endif %}
+{% endblock %}

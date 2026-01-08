@@ -80,13 +80,20 @@
     (merge
       {:join? (if (some? join?) join? true)
        :init (partial init fast)
-       :open-browser? true
+       :open-browser? false
        :auto-refresh? fast ; w/o fast it would often try to reload the page before it has been fully compiled
        :refresh-paths [(:public-dest @resolved-config)]}
       opts)))
 
 (defn -main [& args]
-  (serve {:port 3000 :fast ((set args) "fast")}))
+  (let [opts (set args)
+        port (or (some-> (filter #(re-matches #"port=\d+" %) opts)
+                         first
+                         (subs 5)
+                         Integer/parseInt)
+                 3000)
+        fast? (opts "fast")]
+    (serve {:port port :fast fast?})))
 
 (comment
   (def srv (serve {:join? false, :fast true}))
