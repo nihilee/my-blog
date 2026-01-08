@@ -59,7 +59,11 @@
                       (and body
                            (instance? File body)
                            (string/ends-with? (.getName body) ".html"))
-                      (assoc-in [:headers "Content-Type"] "text/html; charset=utf-8")))
+                      (assoc-in [:headers "Content-Type"] "text/html; charset=utf-8")
+                      (and body
+                           (instance? File body)
+                           (string/ends-with? (.getName body) ".xml"))
+                      (assoc-in [:headers "Content-Type"] "application/rss+xml; charset=utf-8")))
             (handler request)))))
 
 (defroutes routes
