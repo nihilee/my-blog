@@ -1,465 +1,164 @@
-# Cryogen 博客框架详细使用指南
+# My Blog
 
-## 1. 框架概述
+## 博客概述
 
-Cryogen 是一个用 Clojure 编写的简单、快速的静态博客生成器。它允许用户使用 Markdown 或 AsciiDoc 编写内容，然后生成纯静态 HTML 文件，可以轻松部署到任何 Web 服务器上。
+这是一个基于 [Cryogen](http://cryogenweb.org/) 静态博客框架搭建的个人技术博客，用于分享技术知识、编程经验和学习心得。博客使用 Clojure 构建，支持 Markdown 格式编写内容，生成纯静态 HTML 文件，便于部署和维护。
 
-### 1.1 核心功能
+## 核心特点
 
-- **静态生成**：将 Markdown/AsciiDoc 内容转换为纯静态 HTML 文件
-- **多格式支持**：支持 Markdown (.md) 和 AsciiDoc (.asc) 两种文档格式
-- **主题系统**：内置多种主题，支持自定义主题
-- **本地预览**：提供开发服务器，支持实时预览和热重载
-- **内容组织**：支持文章、页面、标签、归档等结构
-- **RSS 订阅**：自动生成 RSS 订阅源
-- **评论集成**：支持 Disqus 评论系统
+- **静态生成**：将 Markdown 内容转换为纯静态 HTML 文件，部署简单快速
+- **多主题支持**：内置多种主题，支持自定义样式
+- **实时预览**：提供本地开发服务器，支持热重载功能
+- **内容组织**：支持文章、页面、标签、归档等完整的博客功能
+- **RSS 订阅**：自动生成 RSS 订阅源，方便读者订阅更新
+- **评论系统**：支持集成 Disqus 评论系统（可配置）
 - **社交媒体集成**：支持 Twitter 和 Mastodon 链接
 
-### 1.2 架构特点
+## 内容结构
 
-- **分离关注点**：内容与表现分离，便于维护和扩展
-- **简单配置**：使用 EDN 格式的配置文件，简洁易懂
-- **插件系统**：支持扩展功能
-- **快速构建**：基于 Clojure 的高效编译系统
+### 主要文章
 
-### 1.3 适用场景
+- **[Cryogen 博客框架详细使用指南](/blog/posts-output/2026-01-08-cryogen-博客框架详细使用指南/)**
+  - 框架概述与核心功能
+  - 环境搭建与配置说明
+  - 创建新博客流程
+  - 主题系统与自定义
+  - 高级功能与常见问题
 
-- 个人技术博客
-- 项目文档站点
-- 团队知识库
-- 静态产品展示页
-- 需要快速部署的内容网站
+### 技术分类
 
-### 1.4 技术优势
+博客内容主要涵盖以下技术领域：
+- Clojure 编程
+- 静态网站开发
+- 博客框架使用
+- 技术文档撰写
+- 软件开发实践
 
-- **无需数据库**：生成纯静态文件，部署简单
-- **高性能**：静态文件加载速度快，减轻服务器压力
-- **安全性高**：无服务器端代码，减少安全漏洞
-- **易于备份**：所有内容都是文本文件，便于版本控制和备份
-- **灵活扩展**：支持自定义主题和插件
-
-## 2. 环境搭建
-
-### 2.1 安装依赖
-
-Cryogen 基于 Clojure 构建，需要安装以下依赖：
-
-#### 2.1.1 Java 开发环境
-
-Cryogen 需要 Java 8 或更高版本。安装方法：
-
-```bash
-# Ubuntu/Debian
-sudo apt-get update
-sudo apt-get install openjdk-11-jdk
-
-# CentOS/RHEL
-sudo yum install java-11-openjdk-devel
-
-# macOS (使用 Homebrew)
-brew install openjdk@11
-```
-
-验证安装：
-```bash
-java -version
-```
-
-#### 2.1.2 Leiningen
-
-Leiningen 是 Clojure 的构建工具。安装方法：
-
-```bash
-# Linux/macOS
-curl https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein > lein
-chmod +x lein
-sudo mv lein /usr/local/bin/
-
-# Windows
-# 下载 https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein.bat 并添加到 PATH
-```
-
-验证安装：
-```bash
-lein version
-```
-
-### 2.2 获取 Cryogen
-
-直接克隆或下载本项目：
-
-```bash
-git clone <repository-url> my-blog
-cd my-blog
-```
-
-## 3. 配置文件说明
-
-Cryogen 的主要配置文件是 `content/config.edn`，使用 EDN (Clojure 的数据格式) 编写。
-
-### 3.1 核心配置项
-
-```edn
-{:site-title                   "My Awesome Blog"  ; 网站标题
- :author                       "Bob Bobbert"     ; 作者名称
- :description                  "This blog is awesome"  ; 网站描述
- :site-url                     "http://blogawesome.com/"  ; 网站 URL
- :post-root                    "posts"          ; 文章目录
- :page-root                    "pages"          ; 页面目录
- :post-root-uri                "posts-output"   ; 文章输出路径
- :page-root-uri                "pages-output"   ; 页面输出路径
- :tag-root-uri                 "tags-output"    ; 标签输出路径
- :author-root-uri              "authors-output" ; 作者输出路径
- :public-dest                  "public"         ; 静态文件输出目录
- :blog-prefix                  "/blog"          ; 博客前缀路径
- :rss-name                     "feed.xml"       ; RSS 文件名
- :rss-filters                  ["cryogen"]      ; RSS 过滤标签
- :recent-posts                 3                ; 首页显示的最新文章数
- :post-date-format             "yyyy-MM-dd"     ; 文章日期格式
- :archive-group-format         "yyyy MMMM"      ; 归档分组格式
- :theme                        "blue"           ; 使用的主题
- :resources                    ["img"]          ; 资源目录
- :keep-files                   [".git"]         ; 生成时保留的文件
- :disqus?                      false            ; 是否启用 Disqus 评论
- :disqus-shortname             ""               ; Disqus 短名称
- :previews?                    false            ; 是否显示文章预览
- :posts-per-page               5                ; 每页显示的文章数
- :blocks-per-preview           2                ; 预览显示的区块数
- :clean-urls                   :trailing-slash  ; URL 格式 (:trailing-slash/:no-trailing-slash/:dirty)
- :collapse-subdirs?            false            ; 是否折叠子目录
- :hide-future-posts?           true             ; 是否隐藏未来日期的文章
- :twitter-acct                 nil              ; Twitter 账号
- :mastodon                     {:host nil        ; Mastodon 主机
-                                :acct nil        ; Mastodon 账号
-                                }}
-```
-
-### 3.2 配置项详解
-
-- **site-title**: 网站的标题，将显示在浏览器标签和首页
-- **author**: 博客作者名称
-- **description**: 网站的简短描述，用于 SEO 和 RSS
-- **site-url**: 网站的完整 URL，用于生成 RSS 和绝对链接
-- **post-root/page-root**: 内容目录中存放文章/页面的子目录
-- **post-root-uri/page-root-uri**: 生成的静态文件中文章/页面的路径
-- **public-dest**: 生成的静态 HTML 文件的输出目录
-- **blog-prefix**: 博客在网站中的前缀路径，如 `/blog`
-- **theme**: 使用的主题名称，必须与 `themes/` 目录下的主题目录名一致
-- **clean-urls**: URL 格式选项：
-  - `:trailing-slash`: `/posts/2023-01-01/my-post/`
-  - `:no-trailing-slash`: `/posts/2023-01-01/my-post`
-  - `:dirty`: `/posts/2023-01-01/my-post.html`
-- **previews?**: 是否在首页和归档页显示文章预览而不是完整内容
-- **disqus?/disqus-shortname**: 启用 Disqus 评论并配置短名称
-
-## 4. 核心命令详解
-
-### 4.1 编译生成静态文件
-
-```bash
-lein run
-```
-
-该命令将编译 `content/` 目录中的所有内容，并将生成的静态文件输出到 `public/` 目录。
-
-### 4.2 本地预览服务器
-
-```bash
-lein serve
-```
-
-启动本地预览服务器，默认监听端口 3000。在浏览器中访问 `http://localhost:3000` 即可查看博客。
-
-### 4.3 快速预览（热重载）
-
-```bash
-lein serve:fast
-```
-
-启动快速预览服务器，支持热重载功能。当修改内容或主题时，页面会自动刷新，无需手动重新编译。
-
-## 5. 创建新博客流程
-
-### 5.1 目录结构
-
-在开始创建内容之前，先了解一下 Cryogen 的目录结构：
+## 目录结构
 
 ```
 my-blog/
 ├── content/                # 内容目录
 │   ├── md/                 # Markdown 格式内容
 │   │   ├── posts/          # 博客文章
-│   │   └── pages/          # 页面
-│   ├── asc/                # AsciiDoc 格式内容
+│   │   └── pages/          # 独立页面
 │   ├── css/                # 自定义 CSS
 │   ├── img/                # 图片资源
 │   └── config.edn          # 配置文件
 ├── themes/                 # 主题目录
 ├── src/                    # 源代码
-└── public/                 # 生成的静态文件
+├── public/                 # 生成的静态文件
+└── README.md               # 博客说明文档
 ```
 
-### 5.2 创建新文章
+## 使用说明
 
-#### 5.2.1 使用 Markdown 格式
+### 环境要求
 
-在 `content/md/posts/` 目录下创建一个新文件，命名格式为 `YYYY-MM-DD-文章标题.md`，例如：
+- Java 8 或更高版本
+- Leiningen（Clojure 构建工具）
+
+### 快速开始
+
+1. **克隆或下载项目**
+
+2. **启动本地预览服务器**
+   ```bash
+   lein serve:fast
+   ```
+   在浏览器中访问 `http://localhost:3000` 查看博客
+
+3. **创建新文章**
+   在 `content/md/posts/` 目录下创建新文件，命名格式为 `YYYY-MM-DD-文章标题.md`
+
+4. **编译生成静态文件**
+   ```bash
+   lein run
+   ```
+   生成的静态文件将保存在 `public/` 目录中
+
+### 常用命令
 
 ```bash
-nano content/md/posts/2023-01-15-我的第一篇博客.md
-```
-
-文章内容格式如下：
-
-```markdown
-{:title "我的第一篇博客"  ; 文章标题
- :date "2023-01-15"     ; 发布日期
- :tags ["入门" "指南"]   ; 标签
- :author "张三"         ; 作者（可选）
- :description "这是我的第一篇博客文章"}  ; 描述（可选）
-
-# 欢迎阅读我的博客
-
-这是我的第一篇博客文章，使用 Cryogen 博客框架创建。
-
-## 什么是 Cryogen？
-
-Cryogen 是一个用 Clojure 编写的静态博客生成器...
-```
-
-#### 5.2.2 使用 AsciiDoc 格式
-
-在 `content/asc/posts/` 目录下创建一个新文件，命名格式为 `YYYY-MM-DD-文章标题.asc`，例如：
-
-```bash
-nano content/asc/posts/2023-01-15-我的第一篇博客.asc
-```
-
-文章内容格式如下：
-
-```asciidoc
-= 我的第一篇博客
-张三
-2023-01-15
-:tags: 入门, 指南
-:description: 这是我的第一篇博客文章
-
-欢迎阅读我的博客
-----------------
-
-这是我的第一篇博客文章，使用 Cryogen 博客框架创建。
-
-== 什么是 Cryogen？
-
-Cryogen 是一个用 Clojure 编写的静态博客生成器...
-```
-
-### 5.3 创建新页面
-
-页面与文章类似，但不会出现在文章列表中，通常用于创建 "关于我"、"联系方式" 等独立页面。
-
-在 `content/md/pages/` 目录下创建一个新文件，例如：
-
-```bash
-nano content/md/pages/about.md
-```
-
-页面内容格式：
-
-```markdown
-{:title "关于我"  ; 页面标题
- :layout :page   ; 布局类型
- :author "张三"  ; 作者（可选）}
-
-# 关于我
-
-我是张三，一个热爱技术的开发者...
-```
-
-### 5.4 编辑内容
-
-使用你喜欢的文本编辑器编辑 Markdown 或 AsciiDoc 文件即可。Cryogen 支持标准的 Markdown 语法和 AsciiDoc 语法。
-
-### 5.5 本地预览
-
-在编辑内容时，可以使用本地预览功能实时查看效果：
-
-```bash
+# 启动本地预览服务器（快速模式，支持热重载）
 lein serve:fast
+
+# 启动本地预览服务器（普通模式）
+lein serve
+
+# 编译生成静态文件
+lein run
+
+# 清理生成的文件
+lein clean
 ```
 
-然后在浏览器中访问 `http://localhost:3000`，修改内容后页面会自动刷新。
+## 配置说明
 
-### 5.6 发布博客
+博客的主要配置文件是 `content/config.edn`，支持以下核心配置：
 
-当内容编辑完成后，执行以下步骤发布博客：
+- 网站标题和描述
+- 作者信息
+- 主题选择
+- RSS 订阅设置
+- Disqus 评论配置
+- 社交媒体链接
 
-1. **编译生成静态文件**：
+详细配置说明请参考 [Cryogen 官方文档](http://cryogenweb.org/)。
+
+## 主题定制
+
+### 使用现有主题
+
+修改 `content/config.edn` 文件中的 `:theme` 配置项即可切换主题：
+
+```edn
+:theme "modern"  ; 可选：blue, blue_centered, nucleus, lotus, modern
+```
+
+### 自定义主题
+
+1. 在 `themes/` 目录下创建新的主题目录
+2. 复制现有主题的结构和文件
+3. 修改 HTML 模板、CSS 和 JavaScript 文件
+4. 在配置文件中启用新主题
+
+## 部署方式
+
+1. **编译生成静态文件**
    ```bash
    lein run
    ```
 
-2. **部署到服务器**：
-   将 `public/` 目录中的所有文件上传到你的 Web 服务器。可以使用 FTP、SCP 或部署工具（如 rsync、git）。
+2. **部署到服务器**
+   - 将 `public/` 目录中的所有文件上传到 Web 服务器
+   - 支持部署到 GitHub Pages、Netlify、Vercel 等平台
+   - 也可以使用 rsync 等工具部署到自己的服务器
 
-   示例：使用 rsync 部署
+   示例（使用 rsync 部署）：
    ```bash
    rsync -avz --delete public/ user@your-server.com:/var/www/blog/
    ```
 
-## 6. 主题系统
+## 更新日志
 
-Cryogen 提供了灵活的主题系统，默认包含以下主题：
+### 2026-01-08
+- 博客初始化
+- 创建 Cryogen 博客框架详细使用指南
+- 配置 RSS 订阅功能
+- 优化主题样式
 
-- **blue**：蓝色主题
-- **blue_centered**：居中布局的蓝色主题
-- **nucleus**：现代简约主题
-- **lotus**：优雅的绿色主题
+## 联系方式
 
-### 6.1 切换主题
+如果有任何问题或建议，欢迎通过以下方式联系：
 
-修改 `content/config.edn` 文件中的 `:theme` 配置项：
+- GitHub: [your-github-username](https://github.com/your-github-username)
+- Email: your-email@example.com
 
-```edn
-:theme "lotus"
-```
+## 许可证
 
-然后重新编译：
+本博客内容采用 [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) 许可证。
 
-```bash
-lein run
-```
+---
 
-### 6.2 自定义主题
-
-1. 在 `themes/` 目录下创建一个新的主题目录，例如 `my-theme`
-
-2. 复制现有主题的结构：
-   ```
-   my-theme/
-   ├── css/          # CSS 文件
-   ├── js/           # JavaScript 文件
-   ├── html/         # HTML 模板
-   └── img/          # 图片资源
-   ```
-
-3. 修改模板文件，模板使用 Selmer 模板引擎（类似 Django 模板）
-
-4. 在配置文件中启用新主题：
-   ```edn
-   :theme "my-theme"
-   ```
-
-## 7. 高级功能
-
-### 7.1 使用标签
-
-在文章头部添加 `:tags` 配置项即可为文章添加标签：
-
-```markdown
-{:title "我的第一篇博客"
- :date "2023-01-15"
- :tags ["入门" "指南"]}
-```
-
-Cryogen 会自动生成标签页面，访问 `/tags-output/标签名/` 可以查看所有带有该标签的文章。
-
-### 7.2 文章归档
-
-Cryogen 会自动生成按月份分组的文章归档页面，访问 `/archives/` 即可查看。
-
-### 7.3 RSS 订阅
-
-Cryogen 默认生成 RSS 订阅文件 `feed.xml`，访问 `/blog/feed.xml`（根据 `blog-prefix` 配置调整路径）即可获取订阅链接。
-
-可以通过 `:rss-filters` 配置项过滤 RSS 内容：
-
-```edn
-:rss-filters ["技术" "编程"]  ; 只包含带有这些标签的文章
-```
-
-### 7.4 Disqus 评论
-
-1. 注册 Disqus 账号并创建一个新站点
-2. 在配置文件中启用 Disqus：
-   ```edn
-   :disqus? true
-   :disqus-shortname "your-disqus-shortname"
-   ```
-3. 重新编译并部署
-
-### 7.5 社交媒体集成
-
-#### 7.5.1 Twitter
-
-配置 Twitter 账号，文章页面会自动显示 Twitter 分享按钮：
-
-```edn
-:twitter-acct "your-twitter-handle"
-```
-
-#### 7.5.2 Mastodon
-
-配置 Mastodon 账号：
-
-```edn
-:mastodon {:host "mastodon.social"  ; Mastodon 实例
-           :acct "your-username"    ; Mastodon 用户名
-          }
-```
-
-## 8. 常见问题与解决方案
-
-### 8.1 页面不显示最新内容
-
-确保已重新编译并刷新页面：
-
-```bash
-lein run
-```
-
-如果使用本地预览，尝试使用快速预览模式：
-
-```bash
-lein serve:fast
-```
-
-### 8.2 主题修改不生效
-
-确保主题目录名称与配置文件中的 `:theme` 配置一致，并且已重新编译。
-
-### 8.3 中文显示问题
-
-Cryogen 默认支持 UTF-8 编码，确保文本编辑器保存文件时使用 UTF-8 编码。
-
-### 8.4 页面样式错乱
-
-检查是否修改了主题的 CSS 文件，或是否在 `content/css/` 目录中添加了冲突的自定义 CSS。
-
-## 9. 总结
-
-Cryogen 是一个简单、高效的静态博客生成器，适合个人博客、技术文档等场景。它的主要优点包括：
-
-- 简单易用，学习曲线平缓
-- 生成纯静态文件，部署方便
-- 支持 Markdown 和 AsciiDoc 格式
-- 灵活的主题系统
-- 本地预览和热重载功能
-- 丰富的扩展功能
-
-通过本指南，你应该已经掌握了 Cryogen 的基本使用方法，可以开始创建和部署自己的博客了。祝你使用愉快！
-
-## 10. 附录
-
-### 10.1 快捷键和技巧
-
-- 使用 `lein serve:fast` 进行快速预览和热重载
-- 使用 Git 对博客内容进行版本控制
-- 定期备份 `content/` 目录和 `themes/` 目录
-
-### 10.2 资源链接
-
-- [Cryogen 官方文档](http://cryogenweb.org/)
-- [Markdown 语法指南](https://www.markdownguide.org/)
-- [AsciiDoc 语法指南](https://asciidoc.org/)
-- [Clojure 官方网站](https://clojure.org/)
+**感谢阅读！** 希望本博客能为您提供有价值的技术内容。
